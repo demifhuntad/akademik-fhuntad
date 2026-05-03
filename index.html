@@ -716,6 +716,29 @@
   .tab-btn.active { color: var(--red); border-bottom-color: var(--red); }
   .tab-btn:hover { color: var(--gray-800); }
 
+
+  /* ===== PASSWORD TOGGLE ===== */
+  .pwd-wrapper {
+    position: relative;
+  }
+  .pwd-wrapper input {
+    padding-right: 44px !important;
+  }
+  .pwd-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: var(--gray-400);
+    padding: 0;
+    line-height: 1;
+    transition: color 0.2s;
+  }
+  .pwd-toggle:hover { color: var(--gray-800); }
   /* ===== ROLE BUTTONS ===== */
   .role-btn {
     width: 100%;
@@ -813,7 +836,10 @@
       </div>
       <div class="form-group">
         <label>Password</label>
-        <input type="password" id="loginPass" placeholder="Masukkan password..." autocomplete="current-password">
+        <div class="pwd-wrapper">
+          <input type="password" id="loginPass" placeholder="Masukkan password..." autocomplete="current-password">
+          <button type="button" class="pwd-toggle" onclick="togglePwd('loginPass', this)" tabindex="-1">👁</button>
+        </div>
       </div>
       <button class="btn btn-primary" onclick="doLogin()" id="loginBtn">🔐 Masuk</button>
     </div>
@@ -964,7 +990,7 @@
                   <th>Nama</th>
                   <th>NIM</th>
                   <th>Jenis Layanan</th>
-                  <th>Program Studi</th>
+                  <th>Bagian Kekhususan</th>
                   <th>Status</th>
                   <th>Aksi</th>
                 </tr>
@@ -997,35 +1023,54 @@
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>Program Studi</label>
+              <label>Bagian Kekhususan</label>
               <select id="fProdi">
-                <option value="">-- Pilih Prodi --</option>
-                <option>Ilmu Hukum</option>
-                <option>Hukum Pidana</option>
+                <option value="">-- Pilih Bagian Kekhususan --</option>
                 <option>Hukum Perdata</option>
-                <option>Hukum Tata Negara</option>
-                <option>Hukum Bisnis</option>
+                <option>Hukum Pidana</option>
+                <option>Hukum Internasional (HI)</option>
+                <option>Hukum Tata Negara & Hukum Administrasi Negara (HTN HAN)</option>
               </select>
             </div>
             <div class="form-group">
-              <label>Semester</label>
-              <input type="number" id="fSemester" placeholder="Contoh: 6" min="1" max="14">
+              <label>Tahun Angkatan</label>
+              <input type="number" id="fSemester" placeholder="Contoh: 2022" min="2000" max="2030">
             </div>
           </div>
           <div class="form-group">
             <label>Jenis Layanan *</label>
             <select id="fLayanan">
               <option value="">-- Pilih Jenis Layanan --</option>
-              <option>Surat Keterangan Aktif</option>
-              <option>Surat Keterangan Lulus</option>
-              <option>Transkrip Nilai</option>
-              <option>Legalisir Ijazah</option>
-              <option>Surat Rekomendasi</option>
-              <option>Permohonan Cuti</option>
-              <option>Kartu Tanda Mahasiswa</option>
-              <option>Surat Pengantar Penelitian</option>
-              <option>Surat Tugas</option>
-              <option>Lainnya</option>
+              <optgroup label="Surat Keterangan">
+                <option>Surat Keterangan Aktif Kuliah</option>
+                <option>Surat Keterangan Lulus</option>
+                <option>Surat Keterangan Pernah Kuliah</option>
+                <option>Surat Keterangan Bebas Pustaka</option>
+                <option>Surat Keterangan Bebas Administrasi</option>
+              </optgroup>
+              <optgroup label="Dokumen Akademik">
+                <option>Transkrip Nilai Sementara</option>
+                <option>Transkrip Nilai Asli</option>
+                <option>Legalisir Ijazah</option>
+                <option>Legalisir Transkrip</option>
+                <option>Kartu Tanda Mahasiswa (KTM)</option>
+                <option>Kartu Rencana Studi (KRS)</option>
+                <option>Kartu Hasil Studi (KHS)</option>
+              </optgroup>
+              <optgroup label="Surat Permohonan">
+                <option>Surat Rekomendasi</option>
+                <option>Surat Pengantar Penelitian</option>
+                <option>Surat Pengantar PKL / Magang</option>
+                <option>Surat Izin Riset</option>
+                <option>Surat Tugas</option>
+                <option>Permohonan Cuti Akademik</option>
+                <option>Permohonan Aktif Kembali</option>
+                <option>Permohonan Pindah Studi</option>
+              </optgroup>
+              <optgroup label="Lainnya">
+                <option>Pengurusan Wisuda</option>
+                <option>Lainnya</option>
+              </optgroup>
             </select>
           </div>
           <div class="form-group">
@@ -1121,7 +1166,7 @@
             <div class="detail-key">Backend</div>
             <div class="detail-val">Google Sheets via Apps Script</div>
             <div class="detail-key">Admin</div>
-            <div class="detail-val">Erna, Nurul, Devi</div>
+            <div class="detail-val">Erna, Nurul, Devi, Tina</div>
           </div>
           <a href="https://akademik-fhuntad.netlify.app" target="_blank" class="btn btn-primary" style="text-decoration:none;">🌐 Buka Website</a>
         </div>
@@ -1213,6 +1258,20 @@ let currentRow = null;
 let currentRowIndex = null;
 let currentPage = 1;
 const PAGE_SIZE = 15;
+
+
+// ===== TOGGLE PASSWORD VISIBILITY =====
+function togglePwd(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    input.type = 'password';
+    btn.textContent = '👁';
+  }
+}
 
 // ===== AUTH =====
 let selectedRole = null;
@@ -1372,7 +1431,7 @@ function generateDemoData() {
   const names = ['Ahmad Fauzi', 'Siti Rahayu', 'Budi Santoso', 'Dewi Lestari', 'Rizky Pratama', 'Nur Aini', 'Fajar Hidayat', 'Maya Sari'];
   const layanan = ['Surat Keterangan Aktif', 'Transkrip Nilai', 'Legalisir Ijazah', 'Surat Rekomendasi', 'Permohonan Cuti'];
   const status = ['Menunggu', 'Diproses', 'Selesai', 'Ditolak'];
-  const prodi = ['Ilmu Hukum', 'Hukum Pidana', 'Hukum Perdata'];
+  const prodi = ['Hukum Perdata', 'Hukum Pidana', 'Hukum Internasional (HI)', 'Hukum Tata Negara & Hukum Administrasi Negara (HTN HAN)'];
   const demo = [];
   for (let i = 0; i < 20; i++) {
     const d = new Date(); d.setDate(d.getDate() - i * 2);
@@ -1381,7 +1440,7 @@ function generateDemoData() {
       nama: names[i % names.length],
       nim: '20140' + String(1000 + i * 13).padStart(4,'0'),
       prodi: prodi[i % prodi.length],
-      semester: String((i % 7) + 1),
+      semester: String(2019 + (i % 6)),
       layanan: layanan[i % layanan.length],
       keperluan: 'Keperluan administrasi akademik',
       email: 'mahasiswa' + i + '@untad.ac.id',
@@ -1673,11 +1732,17 @@ function renderPwdCards() {
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end;">
         <div class="form-group" style="margin:0;">
           <label>Password Baru</label>
-          <input type="password" id="pwd_${key}" placeholder="Password baru..." autocomplete="new-password">
+          <div class="pwd-wrapper">
+            <input type="password" id="pwd_${key}" placeholder="Password baru..." autocomplete="new-password">
+            <button type="button" class="pwd-toggle" onclick="togglePwd('pwd_${key}', this)" tabindex="-1">👁</button>
+          </div>
         </div>
         <div class="form-group" style="margin:0;">
           <label>Konfirmasi</label>
-          <input type="password" id="pwd2_${key}" placeholder="Ulangi password...">
+          <div class="pwd-wrapper">
+            <input type="password" id="pwd2_${key}" placeholder="Ulangi password...">
+            <button type="button" class="pwd-toggle" onclick="togglePwd('pwd2_${key}', this)" tabindex="-1">👁</button>
+          </div>
         </div>
       </div>
       <div id="pwdMsg_${key}" style="font-size:13px;margin-top:8px;display:none;"></div>
